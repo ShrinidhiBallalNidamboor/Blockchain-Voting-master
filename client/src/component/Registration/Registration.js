@@ -73,7 +73,9 @@ export default class Registration extends Component {
       if (this.state.account === admin) {
         this.setState({ isAdmin: true });
       }
-
+      else{
+        this.setState({ isAdmin: false });
+      }
       // Get start and end values
       const start = await this.state.ElectionInstance.methods.getStart().call();
       this.setState({ isElStarted: start });
@@ -151,6 +153,7 @@ export default class Registration extends Component {
         </>
       );
     }
+    if(this.state.isAdmin){
     return (
       <>
         {this.state.isAdmin ? <NavbarAdmin /> : <Navbar />}
@@ -172,7 +175,7 @@ export default class Registration extends Component {
                       <input
                         className={"input-r"}
                         type="text"
-                        value={this.state.account}
+                        value={this.state.accountDetail}
                         style={{ width: "400px" }}
                         onChange={this.updateAccount}
                       />{" "}
@@ -250,48 +253,60 @@ export default class Registration extends Component {
         )}
       </>
     );
+    }
+    return (
+      <>
+        {this.state.isAdmin ? <NavbarAdmin /> : <Navbar />}
+        {!this.state.isElStarted && !this.state.isElEnded ? (
+          <NotInit />
+        ) : (
+          <></>)}
+    </>);
   }
 }
 export function loadCurrentVoter(voter, isRegistered) {
-  return (
-    <>
-      <div
-        className={"container-item " + (isRegistered ? "success" : "attention")}
-      >
-        <center>Your Registered Info</center>
-      </div>
-      <div
-        className={"container-list " + (isRegistered ? "success" : "attention")}
-      >
-        <table>
-          <tr>
-            <th>Account Address</th>
-            <td>{voter.address}</td>
-          </tr>
-          <tr>
-            <th>Name</th>
-            <td>{voter.name}</td>
-          </tr>
-          <tr>
-            <th>Phone</th>
-            <td>{voter.phone}</td>
-          </tr>
-          <tr>
-            <th>Voted</th>
-            <td>{voter.hasVoted ? "True" : "False"}</td>
-          </tr>
-          <tr>
-            <th>Verification</th>
-            <td>{voter.isVerified ? "True" : "False"}</td>
-          </tr>
-          <tr>
-            <th>Registered</th>
-            <td>{voter.isRegistered ? "True" : "False"}</td>
-          </tr>
-        </table>
-      </div>
-    </>
-  );
+  if(isRegistered){
+    return (
+      <>
+        <div
+          className={"container-item " + (isRegistered ? "success" : "attention")}
+        >
+          <center>Your Registered Info</center>
+        </div>
+        <div
+          className={"container-list " + (isRegistered ? "success" : "attention")}
+        >
+          <table>
+            <tr>
+              <th>Account Address</th>
+              <td>{voter.address}</td>
+            </tr>
+            <tr>
+              <th>Name</th>
+              <td>{voter.name}</td>
+            </tr>
+            <tr>
+              <th>Phone</th>
+              <td>{voter.phone}</td>
+            </tr>
+            <tr>
+              <th>Voted</th>
+              <td>{voter.hasVoted ? "True" : "False"}</td>
+            </tr>
+            <tr>
+              <th>Verification</th>
+              <td>{voter.isVerified ? "True" : "False"}</td>
+            </tr>
+            <tr>
+              <th>Registered</th>
+              <td>{voter.isRegistered ? "True" : "False"}</td>
+            </tr>
+          </table>
+        </div>
+      </>
+    );
+    }
+  return (<></>);
 }
 export function loadAllVoters(voters) {
   const renderAllVoters = (voter) => {

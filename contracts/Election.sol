@@ -141,8 +141,8 @@ contract Election {
                 isVerified: false,
                 isRegistered: true
             });
-        voterDetails[msg.sender] = newVoter;
-        voters.push(msg.sender);
+        voterDetails[_address] = newVoter;
+        voters.push(_address);
         voterCount += 1;
     }
 
