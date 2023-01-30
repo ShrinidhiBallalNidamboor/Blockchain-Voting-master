@@ -27,11 +27,13 @@ export default class Registration extends Component {
       voterCount: undefined,
       voterName: "",
       voterPhone: "",
+      constituency: "",
       voters: [],
       currentVoter: {
         address: undefined,
         name: null,
         phone: null,
+        constituency: null,
         hasVoted: false,
         isVerified: false,
         isRegistered: false,
@@ -100,6 +102,7 @@ export default class Registration extends Component {
           address: voter.voterAddress,
           name: voter.name,
           phone: voter.phone,
+          constituency: voter.constituency,
           hasVoted: voter.hasVoted,
           isVerified: voter.isVerified,
           isRegistered: voter.isRegistered,
@@ -116,6 +119,7 @@ export default class Registration extends Component {
           address: voter.voterAddress,
           name: voter.name,
           phone: voter.phone,
+          constituency: voter.constituency,
           hasVoted: voter.hasVoted,
           isVerified: voter.isVerified,
           isRegistered: voter.isRegistered,
@@ -138,9 +142,12 @@ export default class Registration extends Component {
   updateAccount = (event) => {
     this.setState({ accountDetail: event.target.value });
   };
+  updateConstituency = (event) => {
+    this.setState({ constituency: event.target.value });
+  };
   registerAsVoter = async () => {
     await this.state.ElectionInstance.methods
-      .registerAsVoter(this.state.accountDetail, this.state.voterName, this.state.voterPhone)
+      .registerAsVoter(this.state.accountDetail, this.state.voterName, this.state.voterPhone, this.state.constituency)
       .send({ from: this.state.account, gas: 1000000 });
     window.location.reload();
   };
@@ -202,6 +209,18 @@ export default class Registration extends Component {
                         placeholder="eg. 9841234567"
                         value={this.state.voterPhone}
                         onChange={this.updateVoterPhone}
+                      />
+                    </label>
+                  </div>
+                  <div className="div-li">
+                    <label className={"label-r"}>
+                      Constituency <span style={{ color: "tomato" }}>*</span>
+                      <input
+                        className={"input-r"}
+                        type="text"
+                        placeholder="eg. Dakshina Kannada"
+                        value={this.state.constituency}
+                        onChange={this.updateConstituency}
                       />
                     </label>
                   </div>

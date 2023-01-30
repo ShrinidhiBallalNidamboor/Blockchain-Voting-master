@@ -30,6 +30,7 @@ export default class Voting extends Component {
         address: undefined,
         name: null,
         phone: null,
+        constituency: null,
         hasVoted: false,
         isVerified: false,
         isRegistered: false,
@@ -77,19 +78,6 @@ export default class Voting extends Component {
       const end = await this.state.ElectionInstance.methods.getEnd().call();
       this.setState({ isElEnded: end });
 
-      // Loading Candidates details
-      for (let i = 1; i <= this.state.candidateCount; i++) {
-        const candidate = await this.state.ElectionInstance.methods
-          .candidateDetails(i - 1)
-          .call();
-        this.state.candidates.push({
-          id: candidate.candidateId,
-          header: candidate.header,
-          slogan: candidate.slogan,
-        });
-      }
-      this.setState({ candidates: this.state.candidates });
-
       // Loading current voter
       const voter = await this.state.ElectionInstance.methods
         .voterDetails(this.state.account)
@@ -99,11 +87,27 @@ export default class Voting extends Component {
           address: voter.voterAddress,
           name: voter.name,
           phone: voter.phone,
+          constituency: voter.constituency,
           hasVoted: voter.hasVoted,
           isVerified: voter.isVerified,
           isRegistered: voter.isRegistered,
         },
       });
+
+      // Loading Candidates details
+      for (let i = 1; i <= this.state.candidateCount; i++) {
+        const candidate = await this.state.ElectionInstance.methods
+          .candidateDetails(i - 1)
+          .call();
+        if(candidate.constituency==this.state.currentVoter.constituency)
+        this.state.candidates.push({
+          id: candidate.candidateId,
+          header: candidate.header,
+          slogan: candidate.slogan,
+          constituency: candidate.constituency
+        });
+      }
+      this.setState({ candidates: this.state.candidates });
 
       // Admin account and verification
       const admin = await this.state.ElectionInstance.methods.getAdmin().call();

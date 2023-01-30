@@ -14,6 +14,9 @@ import Election from "../../contracts/Election.json";
 // CSS
 import "./Results.css";
 
+var administration;
+var current;
+
 export default class Result extends Component {
   constructor(props) {
     super(props);
@@ -23,9 +26,19 @@ export default class Result extends Component {
       web3: null,
       isAdmin: false,
       candidateCount: undefined,
+      constituency: null,
       candidates: [],
       isElStarted: false,
       isElEnded: false,
+      currentVoter: {
+        address: undefined,
+        name: null,
+        phone: null,
+        constituency: null,
+        hasVoted: false,
+        isVerified: false,
+        isRegistered: false,
+      },
     };
   }
   componentDidMount = async () => {
@@ -65,26 +78,56 @@ export default class Result extends Component {
       const end = await this.state.ElectionInstance.methods.getEnd().call();
       this.setState({ isElEnded: end });
 
-      // Loadin Candidates detials
+      const voter = await this.state.ElectionInstance.methods
+        .voterDetails(this.state.account)
+        .call();
+      this.setState({
+        currentVoter: {
+          address: voter.voterAddress,
+          name: voter.name,
+          phone: voter.phone,
+          constituency: voter.constituency,
+          hasVoted: voter.hasVoted,
+          isVerified: voter.isVerified,
+          isRegistered: voter.isRegistered,
+        },
+      });
+
+      // Admin account and verification
+      const admin = await this.state.ElectionInstance.methods.getAdmin().call();
+      administration = admin;
+      current = this.state.account;
+      if (this.state.account === admin) {
+        this.setState({ isAdmin: true });
+        for (let i = 1; i <= this.state.candidateCount; i++) {
+          const candidate = await this.state.ElectionInstance.methods
+            .candidateDetails(i - 1)
+            .call();
+          this.state.candidates.push({
+            id: candidate.candidateId,
+            header: candidate.header,
+            slogan: candidate.slogan,
+            constituency: candidate.constituency,
+            voteCount: candidate.voteCount,
+          });
+        }
+      }
+      else
       for (let i = 1; i <= this.state.candidateCount; i++) {
         const candidate = await this.state.ElectionInstance.methods
           .candidateDetails(i - 1)
           .call();
+        if(candidate.constituency===this.state.currentVoter.constituency)
         this.state.candidates.push({
           id: candidate.candidateId,
           header: candidate.header,
           slogan: candidate.slogan,
+          constituency: candidate.constituency,
           voteCount: candidate.voteCount,
         });
       }
 
       this.setState({ candidates: this.state.candidates });
-
-      // Admin account and verification
-      const admin = await this.state.ElectionInstance.methods.getAdmin().call();
-      if (this.state.account === admin) {
-        this.setState({ isAdmin: true });
-      }
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -165,6 +208,76 @@ function displayWinner(candidates) {
       </div>
     );
   };
+  if(administration===current){
+    let party = [];
+    let count = [];
+    let winner = '';
+    for (let i = 0; i < candidates.length; i++) {
+      let valid = 0;
+      for (let j = 0; j < party.length; j++) {
+        if(candidates[i].constituency==party[j]){
+          valid = 1;
+          break;
+        }
+      }
+      if(valid == 0){
+        party.push(candidates[i].constituency);
+        count.push('');
+      }
+    }
+    for (let i = 0; i < party.length; i++) {
+      let maxVoteRecived = 0;
+      for (let j = 0; j < candidates.length; j++) {
+        if(party[i]==candidates[j].constituency&&maxVoteRecived<candidates[j].voteCount){
+          maxVoteRecived=candidates[j].voteCount;
+        }
+      }
+      for (let j = 0; j < candidates.length; j++) {
+        if(party[i]==candidates[j].constituency&&maxVoteRecived==candidates[j].voteCount){
+          count[i]=candidates[j].slogan;
+        }
+      }
+    }
+    let parties = [];
+    let value = [];
+    for (let i = 0; i < count.length; i++) {
+      let valid = 0;
+      for(let j = 0; j < parties.length; j++){
+        if(parties[j]==count[i]){
+          valid = 1;
+          break;
+        }
+      }
+      if(valid == 0){
+        parties.push(count[i]);
+        value.push(0);
+      }
+    }
+    let maxVoteRecived = 0;
+    for (let i = 0; i < parties.length; i++) {
+      for (let j = 0; j < count.length; j++) {
+        if(parties[i]==count[j]){
+          value[i]+=1;
+          if(maxVoteRecived<value[i]){
+            maxVoteRecived=value[i];
+            winner=parties[i];
+          }
+        }
+      }
+    }
+    return (<>
+      <div className="container-winner">
+        <div className="winner-info">
+          <p className="winner-tag">Winner!</p>
+          <h2> {winner}</h2>
+        </div>
+        <div className="winner-votes">
+          <div className="votes-tag">Total Votes: </div>
+          <div className="vote-count">{maxVoteRecived}</div>
+        </div>
+      </div>
+    </>);
+  }
   const winnerCandidate = getWinner(candidates);
   return <>{winnerCandidate.map(renderWinner)}</>;
 }

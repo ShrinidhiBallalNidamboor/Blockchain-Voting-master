@@ -125,6 +125,7 @@ contract Election {
         address voterAddress;
         string name;
         string phone;
+        string constituency;
         bool isVerified;
         bool hasVoted;
         bool isRegistered;
@@ -133,12 +134,13 @@ contract Election {
     mapping(address => Voter) public voterDetails;
 
     // Request to be added as voter
-    function registerAsVoter(address _address, string memory _name, string memory _phone) public {
+    function registerAsVoter(address _address, string memory _name, string memory _phone, string memory _constituency) public {
         Voter memory newVoter =
             Voter({
                 voterAddress: _address,
                 name: _name,
                 phone: _phone,
+                constituency: _constituency,
                 hasVoted: false,
                 isVerified: false,
                 isRegistered: true
