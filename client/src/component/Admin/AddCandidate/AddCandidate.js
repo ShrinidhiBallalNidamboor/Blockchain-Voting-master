@@ -136,11 +136,11 @@ export default class AddCandidate extends Component {
                 />
               </label>
               <label className={"label-ac"}>
-                Slogan
+                Party
                 <input
                   className={"input-ac"}
                   type="text"
-                  placeholder="eg. It is what it is"
+                  placeholder="eg. party"
                   value={this.state.slogan}
                   onChange={this.updateSlogan}
                 />
