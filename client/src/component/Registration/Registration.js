@@ -260,7 +260,21 @@ export default class Registration extends Component {
         {!this.state.isElStarted && !this.state.isElEnded ? (
           <NotInit />
         ) : (
-          <></>)}
+          <>
+            <div
+              className="container-main"
+              style={{
+                borderTop: this.state.currentVoter.isRegistered
+                  ? null
+                  : "1px solid",
+              }}
+            >
+              {loadCurrentVoter(
+                this.state.currentVoter,
+                this.state.currentVoter.isRegistered
+              )}
+            </div>
+          </>)}
     </>);
   }
 }
@@ -305,7 +319,7 @@ export function loadCurrentVoter(voter, isRegistered) {
         </div>
       </>
     );
-    }
+  }
   return (<></>);
 }
 export function loadAllVoters(voters) {
