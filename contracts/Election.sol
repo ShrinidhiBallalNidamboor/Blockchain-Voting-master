@@ -32,12 +32,13 @@ contract Election {
         uint256 candidateId;
         string header;
         string slogan;
+        string constituency;
         uint256 voteCount;
     }
     mapping(uint256 => Candidate) public candidateDetails;
 
     // Adding new candidates
-    function addCandidate(string memory _header, string memory _slogan)
+    function addCandidate(string memory _header, string memory _slogan, string memory _constituency)
         public
         // Only admin can add
         onlyAdmin
@@ -47,6 +48,7 @@ contract Election {
                 candidateId: candidateCount,
                 header: _header,
                 slogan: _slogan,
+                constituency: _constituency,
                 voteCount: 0
             });
         candidateDetails[candidateCount] = newCandidate;

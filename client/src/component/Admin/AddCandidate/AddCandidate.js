@@ -20,6 +20,7 @@ export default class AddCandidate extends Component {
       isAdmin: false,
       header: "",
       slogan: "",
+      constituency: "",
       candidates: [],
       candidateCount: undefined,
     };
@@ -74,6 +75,7 @@ export default class AddCandidate extends Component {
           id: candidate.candidateId,
           header: candidate.header,
           slogan: candidate.slogan,
+          constituency: candidate.constituency
         });
       }
 
@@ -92,10 +94,12 @@ export default class AddCandidate extends Component {
   updateSlogan = (event) => {
     this.setState({ slogan: event.target.value });
   };
-
+  updateConstituency = (event) => {
+    this.setState({ constituency: event.target.value });
+  };
   addCandidate = async () => {
     await this.state.ElectionInstance.methods
-      .addCandidate(this.state.header, this.state.slogan)
+      .addCandidate(this.state.header, this.state.slogan, this.state.constituency)
       .send({ from: this.state.account, gas: 1000000 });
     window.location.reload();
   };
@@ -143,6 +147,16 @@ export default class AddCandidate extends Component {
                   placeholder="eg. party"
                   value={this.state.slogan}
                   onChange={this.updateSlogan}
+                />
+              </label>
+              <label className={"label-ac"}>
+                constituency
+                <input
+                  className={"input-ac"}
+                  type="text"
+                  placeholder="eg. Dakshina Kannada"
+                  value={this.state.constituency}
+                  onChange={this.updateConstituency}
                 />
               </label>
               <button
