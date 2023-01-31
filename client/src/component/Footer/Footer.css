@@ -6,7 +6,7 @@
   overflow: auto;
 }
 .footer {
-  background-color: beige;
+  background-color: rgb(220, 245, 220);
   border-top: 1px solid #e7e7e7;
   text-align: center;
   position: fixed;
