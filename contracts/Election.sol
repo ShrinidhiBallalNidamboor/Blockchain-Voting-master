@@ -7,6 +7,12 @@ contract Election {
     uint256 voterCount;
     bool start;
     bool end;
+    uint256 private nonce;
+    uint256[] private share;
+    uint256[] private random;
+    uint256[][] private matrix;
+    uint256[] private temp;
+    uint256[] private sum;
 
     constructor() public {
         // Initilizing default values
@@ -33,6 +39,7 @@ contract Election {
         string header;
         string slogan;
         string constituency;
+        uint256 random;
         uint256 voteCount;
     }
     mapping(uint256 => Candidate) public candidateDetails;
@@ -49,6 +56,7 @@ contract Election {
                 header: _header,
                 slogan: _slogan,
                 constituency: _constituency,
+                random: 0,
                 voteCount: 0
             });
         candidateDetails[candidateCount] = newCandidate;
@@ -159,13 +167,54 @@ contract Election {
         voterDetails[voterAddress].isVerified = _verifedStatus;
     }
 
+    //random
+    function getRandom() public returns (uint256) {
+        nonce++;
+        return uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce))) % 100;
+    }
+
     // Vote
     function vote(uint256 candidateId) public {
         require(voterDetails[msg.sender].hasVoted == false);
         require(voterDetails[msg.sender].isVerified == true);
         require(start == true);
         require(end == false);
-        candidateDetails[candidateId].voteCount += 1;
+        
+        uint256 total = getTotalCandidate();
+        for(uint256 i=0;i<total;i++){
+            share.push(0);
+        }
+        share[candidateId]=1;
+        for(uint256 i=0;i<total;i++){
+            random.push(getRandom());
+        }
+        for(uint256 i=0;i<total;i++){
+            temp.push(0);
+        }
+        for(uint256 i=0;i<total;i++){
+            matrix.push(temp);
+        }
+        for(uint256 i=0;i<total;i++){
+            matrix[i][i]=total-i;
+        }
+        for(uint256 i=0;i<total;i++){
+            matrix[i][total-1]=1;
+        }
+        for(uint256 i=0;i<total;i++){
+            share[i]+=random[i];
+        }
+        uint256 add=0;
+        for(uint256 i=0;i<total;i++){
+            add=0;
+            for(uint256 k=0;k<total;k++){
+                add+=matrix[i][k]*share[k];
+            }
+            sum.push(add);
+        }
+        for(uint256 i=0;i<total;i++){
+            candidateDetails[i].voteCount+=sum[i];
+            candidateDetails[i].random+=random[i];
+        }
         voterDetails[msg.sender].hasVoted = true;
     }
 
