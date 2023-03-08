@@ -109,7 +109,6 @@ export default class Result extends Component {
             slogan: candidate.slogan,
             constituency: candidate.constituency,
             random: candidate.random,
-            share: candidate.share,
             voteCount: candidate.voteCount,
           });
         }
@@ -126,7 +125,6 @@ export default class Result extends Component {
           slogan: candidate.slogan,
           constituency: candidate.constituency,
           random: candidate.random,
-          share: candidate.share,
           voteCount: candidate.voteCount,
         });
       }
