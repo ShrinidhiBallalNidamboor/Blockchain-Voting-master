@@ -108,6 +108,8 @@ export default class Result extends Component {
             header: candidate.header,
             slogan: candidate.slogan,
             constituency: candidate.constituency,
+            random: candidate.random,
+            share: candidate.share,
             voteCount: candidate.voteCount,
           });
         }
@@ -123,6 +125,8 @@ export default class Result extends Component {
           header: candidate.header,
           slogan: candidate.slogan,
           constituency: candidate.constituency,
+          random: candidate.random,
+          share: candidate.share,
           voteCount: candidate.voteCount,
         });
       }
@@ -179,15 +183,17 @@ export default class Result extends Component {
 }
 
 function displayWinner(candidates) {
+  
   const getWinner = (candidates) => {
     // Returns an object having maxium vote count
+    let total=candidates.length
     let maxVoteRecived = 0;
     let winnerCandidate = [];
     for (let i = 0; i < candidates.length; i++) {
-      if (candidates[i].voteCount > maxVoteRecived) {
-        maxVoteRecived = candidates[i].voteCount;
+      if ((candidates[i].voteCount-candidates[i].random) > maxVoteRecived) {
+        maxVoteRecived = (candidates[i].voteCount-candidates[i].random);
         winnerCandidate = [candidates[i]];
-      } else if (candidates[i].voteCount === maxVoteRecived) {
+      } else if ((candidates[i].voteCount-candidates[i].random) === maxVoteRecived) {
         winnerCandidate.push(candidates[i]);
       }
     }
@@ -215,12 +221,12 @@ function displayWinner(candidates) {
     for (let i = 0; i < candidates.length; i++) {
       let valid = 0;
       for (let j = 0; j < party.length; j++) {
-        if(candidates[i].constituency==party[j]){
+        if(candidates[i].constituency===party[j]){
           valid = 1;
           break;
         }
       }
-      if(valid == 0){
+      if(valid === 0){
         party.push(candidates[i].constituency);
         count.push('');
       }
@@ -228,12 +234,12 @@ function displayWinner(candidates) {
     for (let i = 0; i < party.length; i++) {
       let maxVoteRecived = 0;
       for (let j = 0; j < candidates.length; j++) {
-        if(party[i]==candidates[j].constituency&&maxVoteRecived<candidates[j].voteCount){
-          maxVoteRecived=candidates[j].voteCount;
+        if(party[i]===candidates[j].constituency&&maxVoteRecived<(candidates[j].voteCount-candidates[j].random)){
+          maxVoteRecived=(candidates[j].voteCount-candidates[j].random);
         }
       }
       for (let j = 0; j < candidates.length; j++) {
-        if(party[i]==candidates[j].constituency&&maxVoteRecived==candidates[j].voteCount){
+        if(party[i]===candidates[j].constituency&&maxVoteRecived===(candidates[j].voteCount-candidates[j].random)){
           count[i]=candidates[j].slogan;
         }
       }
@@ -243,12 +249,12 @@ function displayWinner(candidates) {
     for (let i = 0; i < count.length; i++) {
       let valid = 0;
       for(let j = 0; j < parties.length; j++){
-        if(parties[j]==count[i]){
+        if(parties[j]===count[i]){
           valid = 1;
           break;
         }
       }
-      if(valid == 0){
+      if(valid === 0){
         parties.push(count[i]);
         value.push(0);
       }
@@ -256,7 +262,7 @@ function displayWinner(candidates) {
     let maxVoteRecived = 0;
     for (let i = 0; i < parties.length; i++) {
       for (let j = 0; j < count.length; j++) {
-        if(parties[i]==count[j]){
+        if(parties[i]===count[j]){
           value[i]+=1;
           if(maxVoteRecived<value[i]){
             maxVoteRecived=value[i];
@@ -288,7 +294,7 @@ export function displayResults(candidates) {
       <tr>
         <td>{candidate.id}</td>
         <td>{candidate.header}</td>
-        <td>{candidate.voteCount}</td>
+        <td>{candidate.voteCount-candidate.random}</td>
       </tr>
     );
   };

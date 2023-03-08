@@ -8,11 +8,6 @@ contract Election {
     bool start;
     bool end;
     uint256 private nonce;
-    uint256[] private share;
-    uint256[] private random;
-    uint256[][] private matrix;
-    uint256[] private temp;
-    uint256[] private sum;
 
     constructor() public {
         // Initilizing default values
@@ -181,39 +176,11 @@ contract Election {
         require(end == false);
         
         uint256 total = getTotalCandidate();
+        candidateDetails[candidateId].voteCount+=1;
         for(uint256 i=0;i<total;i++){
-            share.push(0);
-        }
-        share[candidateId]=1;
-        for(uint256 i=0;i<total;i++){
-            random.push(getRandom());
-        }
-        for(uint256 i=0;i<total;i++){
-            temp.push(0);
-        }
-        for(uint256 i=0;i<total;i++){
-            matrix.push(temp);
-        }
-        for(uint256 i=0;i<total;i++){
-            matrix[i][i]=total-i;
-        }
-        for(uint256 i=0;i<total;i++){
-            matrix[i][total-1]=1;
-        }
-        for(uint256 i=0;i<total;i++){
-            share[i]+=random[i];
-        }
-        uint256 add=0;
-        for(uint256 i=0;i<total;i++){
-            add=0;
-            for(uint256 k=0;k<total;k++){
-                add+=matrix[i][k]*share[k];
-            }
-            sum.push(add);
-        }
-        for(uint256 i=0;i<total;i++){
-            candidateDetails[i].voteCount+=sum[i];
-            candidateDetails[i].random+=random[i];
+            uint256 temp=getRandom();
+            candidateDetails[i].voteCount+=temp;
+            candidateDetails[i].random+=temp;
         }
         voterDetails[msg.sender].hasVoted = true;
     }

@@ -99,7 +99,7 @@ export default class Voting extends Component {
         const candidate = await this.state.ElectionInstance.methods
           .candidateDetails(i - 1)
           .call();
-        if(candidate.constituency==this.state.currentVoter.constituency)
+        if(candidate.constituency===this.state.currentVoter.constituency)
         this.state.candidates.push({
           id: candidate.candidateId,
           header: candidate.header,
