@@ -8,6 +8,7 @@ contract Election {
     bool start;
     bool end;
     uint256 private nonce;
+    uint256[] private arr;
 
     constructor() public {
         // Initilizing default values
@@ -34,6 +35,7 @@ contract Election {
         string header;
         string slogan;
         string constituency;
+        uint256[] random_array;
         uint256 random;
         uint256 voteCount;
     }
@@ -52,6 +54,7 @@ contract Election {
                 slogan: _slogan,
                 constituency: _constituency,
                 random: 0,
+                random_array: new uint256[](0),
                 voteCount: 0
             });
         candidateDetails[candidateCount] = newCandidate;
@@ -180,7 +183,7 @@ contract Election {
         for(uint256 i=0;i<total;i++){
             uint256 temp=getRandom();
             candidateDetails[i].voteCount+=temp;
-            candidateDetails[i].random+=temp;
+            candidateDetails[i].random_array.push(temp);
         }
         voterDetails[msg.sender].hasVoted = true;
     }

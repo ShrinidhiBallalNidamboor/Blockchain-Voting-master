@@ -14,6 +14,9 @@ import Election from "../../contracts/Election.json";
 // CSS
 import "./Results.css";
 
+const jiff = require('jiff');
+const jiff_instance = jiff.make_jiff({ party_count: 2, party_id: 1 }); // Create a JIFF instance
+
 var administration;
 var current;
 
@@ -109,6 +112,7 @@ export default class Result extends Component {
             slogan: candidate.slogan,
             constituency: candidate.constituency,
             random: candidate.random,
+            random_array: candidate.random_array,
             voteCount: candidate.voteCount,
           });
         }
@@ -125,6 +129,7 @@ export default class Result extends Component {
           slogan: candidate.slogan,
           constituency: candidate.constituency,
           random: candidate.random,
+          random_array: candidate.random_array,
           voteCount: candidate.voteCount,
         });
       }
@@ -187,6 +192,14 @@ function displayWinner(candidates) {
     let total=candidates.length
     let maxVoteRecived = 0;
     let winnerCandidate = [];
+    for(let i=0;i<total;i++){
+      let array = candidates[i].random_array;
+      let shares = jiff_instance.share_array(array, 2); 
+      let sum = shares.reduce((a, b) => jiff_instance.add(a, b));
+      jiff_instance.open(sum).then((result) => {
+        candidates[i].random=result;
+      });
+    }
     for (let i = 0; i < candidates.length; i++) {
       if ((candidates[i].voteCount-candidates[i].random) > maxVoteRecived) {
         maxVoteRecived = (candidates[i].voteCount-candidates[i].random);
