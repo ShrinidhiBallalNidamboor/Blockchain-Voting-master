@@ -14,6 +14,8 @@ import Election from "../../contracts/Election.json";
 // CSS
 import "./Results.css";
 
+import 'jiff'
+
 const jiff = require('jiff');
 const jiff_instance = jiff.make_jiff({ party_count: 2, party_id: 1 }); // Create a JIFF instance
 
