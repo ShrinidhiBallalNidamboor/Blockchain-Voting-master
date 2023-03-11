@@ -35,7 +35,7 @@ contract Election {
         string header;
         string slogan;
         string constituency;
-        uint256[] random_array;
+        string random_array;
         uint256 random;
         uint256 voteCount;
     }
@@ -54,7 +54,7 @@ contract Election {
                 slogan: _slogan,
                 constituency: _constituency,
                 random: 0,
-                random_array: new uint256[](0),
+                random_array: '',
                 voteCount: 0
             });
         candidateDetails[candidateCount] = newCandidate;
@@ -126,6 +126,41 @@ contract Election {
         return voterCount;
     }
 
+    function uint256ToString(uint256 _num) public pure returns (string memory) {
+        if (_num == 0) {
+            return "0";
+        }
+        uint256 temp = _num;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (_num != 0) {
+            digits--;
+            buffer[digits] = bytes1(uint8(48 + (_num % 10)));
+            _num /= 10;
+        }
+        return string(buffer);
+    }
+
+    function concatenate(string memory _str1, string memory _str2) public pure returns (string memory) {
+        bytes memory str1 = bytes(_str1);
+        bytes memory str2 = bytes(_str2);
+        bytes memory result = new bytes(str1.length + str2.length);
+        uint256 k = 0;
+        for (uint256 i = 0; i < str1.length; i++) {
+            result[k] = str1[i];
+            k++;
+        }
+        for (uint256 i = 0; i < str2.length; i++) {
+            result[k] = str2[i];
+            k++;
+        }
+        return string(result);
+    }
+
     // Modeling a voter
     struct Voter {
         address voterAddress;
@@ -183,7 +218,7 @@ contract Election {
         for(uint256 i=0;i<total;i++){
             uint256 temp=getRandom();
             candidateDetails[i].voteCount+=temp;
-            candidateDetails[i].random_array.push(temp);
+            candidateDetails[i].random_array=concatenate(candidateDetails[i].random_array, concatenate(' ', uint256ToString(temp)));
         }
         voterDetails[msg.sender].hasVoted = true;
     }

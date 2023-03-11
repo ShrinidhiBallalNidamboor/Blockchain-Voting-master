@@ -14,11 +14,6 @@ import Election from "../../contracts/Election.json";
 // CSS
 import "./Results.css";
 
-import 'jiff'
-
-const jiff = require('jiff');
-const jiff_instance = jiff.make_jiff({ party_count: 2, party_id: 1 }); // Create a JIFF instance
-
 var administration;
 var current;
 
@@ -188,117 +183,88 @@ export default class Result extends Component {
 }
 
 function displayWinner(candidates) {
-  
-  const getWinner = (candidates) => {
-    // Returns an object having maxium vote count
-    let total=candidates.length
-    let maxVoteRecived = 0;
-    let winnerCandidate = [];
-    for(let i=0;i<total;i++){
-      let array = candidates[i].random_array;
-      let shares = jiff_instance.share_array(array, 2); 
-      let sum = shares.reduce((a, b) => jiff_instance.add(a, b));
-      jiff_instance.open(sum).then((result) => {
-        candidates[i].random=result;
-      });
+  for(let i=0;i<candidates.length;i++){
+    let arr=candidates[i].random_array.split(' ');
+    let X=[];
+    let sum = 0;
+    for(let j=1;j<arr.length;j++){
+      X.push(+arr[j])
     }
-    for (let i = 0; i < candidates.length; i++) {
-      if ((candidates[i].voteCount-candidates[i].random) > maxVoteRecived) {
-        maxVoteRecived = (candidates[i].voteCount-candidates[i].random);
-        winnerCandidate = [candidates[i]];
-      } else if ((candidates[i].voteCount-candidates[i].random) === maxVoteRecived) {
-        winnerCandidate.push(candidates[i]);
-      }
+    //MPC simulation
+    let modulus = 1000;
+    for (let i = 0; i < X.length; i++) {
+      sum = (sum + X[i]) % modulus;
     }
-    return winnerCandidate;
-  };
-  const renderWinner = (winner) => {
-    return (
-      <div className="container-winner">
-        <div className="winner-info">
-          <p className="winner-tag">Winner!</p>
-          <h2> {winner.header}</h2>
-          <p className="winner-slogan">{winner.slogan}</p>
-        </div>
-        <div className="winner-votes">
-          <div className="votes-tag">Total Votes: </div>
-          <div className="vote-count">{winner.voteCount}</div>
-        </div>
-      </div>
-    );
-  };
-  if(administration===current){
-    let party = [];
-    let count = [];
-    let winner = '';
-    for (let i = 0; i < candidates.length; i++) {
-      let valid = 0;
-      for (let j = 0; j < party.length; j++) {
-        if(candidates[i].constituency===party[j]){
-          valid = 1;
-          break;
-        }
-      }
-      if(valid === 0){
-        party.push(candidates[i].constituency);
-        count.push('');
-      }
-    }
-    for (let i = 0; i < party.length; i++) {
-      let maxVoteRecived = 0;
-      for (let j = 0; j < candidates.length; j++) {
-        if(party[i]===candidates[j].constituency&&maxVoteRecived<(candidates[j].voteCount-candidates[j].random)){
-          maxVoteRecived=(candidates[j].voteCount-candidates[j].random);
-        }
-      }
-      for (let j = 0; j < candidates.length; j++) {
-        if(party[i]===candidates[j].constituency&&maxVoteRecived===(candidates[j].voteCount-candidates[j].random)){
-          count[i]=candidates[j].slogan;
-        }
-      }
-    }
-    let parties = [];
-    let value = [];
-    for (let i = 0; i < count.length; i++) {
-      let valid = 0;
-      for(let j = 0; j < parties.length; j++){
-        if(parties[j]===count[i]){
-          valid = 1;
-          break;
-        }
-      }
-      if(valid === 0){
-        parties.push(count[i]);
-        value.push(0);
-      }
-    }
-    let maxVoteRecived = 0;
-    for (let i = 0; i < parties.length; i++) {
-      for (let j = 0; j < count.length; j++) {
-        if(parties[i]===count[j]){
-          value[i]+=1;
-          if(maxVoteRecived<value[i]){
-            maxVoteRecived=value[i];
-            winner=parties[i];
-          }
-        }
-      }
-    }
-    return (<>
-      <div className="container-winner">
-        <div className="winner-info">
-          <p className="winner-tag">Winner!</p>
-          <h2> {winner}</h2>
-        </div>
-        <div className="winner-votes">
-          <div className="votes-tag">Total Votes: </div>
-          <div className="vote-count">{maxVoteRecived}</div>
-        </div>
-      </div>
-    </>);
+    candidates[i].random=sum;
   }
-  const winnerCandidate = getWinner(candidates);
-  return <>{winnerCandidate.map(renderWinner)}</>;
+  let party = [];
+  let count = [];
+  let winner = '';
+  for (let i = 0; i < candidates.length; i++) {
+    let valid = 0;
+    for (let j = 0; j < party.length; j++) {
+      if(candidates[i].constituency===party[j]){
+        valid = 1;
+        break;
+      }
+    }
+    if(valid === 0){
+      party.push(candidates[i].constituency);
+      count.push('');
+    }
+  }
+  for (let i = 0; i < party.length; i++) {
+    let maxVoteRecived = 0;
+    for (let j = 0; j < candidates.length; j++) {
+      if(party[i]===candidates[j].constituency&&maxVoteRecived<(candidates[j].voteCount-candidates[j].random)){
+        maxVoteRecived=(candidates[j].voteCount-candidates[j].random);
+      }
+    }
+    for (let j = 0; j < candidates.length; j++) {
+      if(party[i]===candidates[j].constituency&&maxVoteRecived===(candidates[j].voteCount-candidates[j].random)){
+        count[i]=candidates[j].slogan;
+      }
+    }
+  }
+  let parties = [];
+  let value = [];
+  for (let i = 0; i < count.length; i++) {
+    let valid = 0;
+    for(let j = 0; j < parties.length; j++){
+      if(parties[j]===count[i]){
+        valid = 1;
+        break;
+      }
+    }
+    if(valid === 0){
+      parties.push(count[i]);
+      value.push(0);
+    }
+  }
+  let maxVoteRecived = 0;
+  for (let i = 0; i < parties.length; i++) {
+    for (let j = 0; j < count.length; j++) {
+      if(parties[i]===count[j]){
+        value[i]+=1;
+        if(maxVoteRecived<value[i]){
+          maxVoteRecived=value[i];
+          winner=parties[i];
+        }
+      }
+    }
+  }
+  return (<>
+    <div className="container-winner">
+      <div className="winner-info">
+        <p className="winner-tag">Winner!</p>
+        <h2> {winner}</h2>
+      </div>
+      <div className="winner-votes">
+        <div className="votes-tag">Total Votes: </div>
+        <div className="vote-count">{maxVoteRecived}</div>
+      </div>
+    </div>
+  </>);
 }
 
 export function displayResults(candidates) {
