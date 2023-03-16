@@ -183,6 +183,7 @@ export default class Result extends Component {
 }
 
 function displayWinner(candidates) {
+  var startTime = Date.now();
   for(let i=0;i<candidates.length;i++){
     let arr=candidates[i].random_array.split(' ');
     let X=[];
@@ -197,6 +198,9 @@ function displayWinner(candidates) {
     }
     candidates[i].random=sum;
   }
+  var endTime = Date.now();
+  var timeInMilliseconds = endTime - startTime;
+  console.log('Multi-Party Computation: ', timeInMilliseconds, ' milliseconds');
   let party = [];
   let count = [];
   let winner = '';

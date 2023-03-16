@@ -98,9 +98,13 @@ export default class AddCandidate extends Component {
     this.setState({ constituency: event.target.value });
   };
   addCandidate = async () => {
+    var startTime = Date.now();
     await this.state.ElectionInstance.methods
       .addCandidate(this.state.header, this.state.slogan, this.state.constituency)
       .send({ from: this.state.account, gas: 1000000 });
+      var endTime = Date.now();
+      var timeInMilliseconds = endTime - startTime;
+      console.log('Added candidate: ', timeInMilliseconds, ' milliseconds');
     window.location.reload();
   };
 

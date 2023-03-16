@@ -146,9 +146,13 @@ export default class Registration extends Component {
     this.setState({ constituency: event.target.value });
   };
   registerAsVoter = async () => {
+    var startTime = Date.now();
     await this.state.ElectionInstance.methods
       .registerAsVoter(this.state.accountDetail, this.state.voterName, this.state.voterPhone, this.state.constituency)
       .send({ from: this.state.account, gas: 1000000 });
+      var endTime = Date.now();
+      var timeInMilliseconds = endTime - startTime;
+      console.log('Add Voter:', timeInMilliseconds, ' milliseconds');
     window.location.reload();
   };
   render() {

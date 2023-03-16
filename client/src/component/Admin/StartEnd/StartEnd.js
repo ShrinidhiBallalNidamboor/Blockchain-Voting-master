@@ -59,7 +59,11 @@ export default class StartEnd extends Component {
       }
 
       // Get election start and end values
+      var startTime = Date.now();
       const start = await this.state.ElectionInstance.methods.getStart().call();
+      var endTime = Date.now();
+      var timeInMilliseconds = endTime - startTime;
+      console.log('Start time: ', timeInMilliseconds, ' milliseconds');
       this.setState({ elStarted: start });
       const end = await this.state.ElectionInstance.methods.getEnd().call();
       this.setState({ elEnded: end });

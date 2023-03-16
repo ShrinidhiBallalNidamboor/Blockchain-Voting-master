@@ -125,9 +125,13 @@ export default class Voting extends Component {
 
   renderCandidates = (candidate) => {
     const castVote = async (id) => {
+      var startTime = Date.now();
       await this.state.ElectionInstance.methods
         .vote(id)
         .send({ from: this.state.account, gas: 1000000 });
+      var endTime = Date.now();
+      var timeInMilliseconds = endTime - startTime;
+      console.log('Vote time: ', timeInMilliseconds, ' milliseconds');
       window.location.reload();
     };
     const confirmVote = (id, header) => {
